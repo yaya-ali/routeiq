@@ -9,7 +9,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 
 from app.budget import check_and_charge
-from app.providers import call_model
+from app.providers import PRICING, call_model
 from app.router import choose_model
 from app.telemetry import record_request, setup_telemetry
 
@@ -46,6 +46,9 @@ async def chat(req: ChatRequest, x_api_key: str = Header(default="anon")) -> Cha
         raise HTTPException(status_code=429, detail=f"Budget exhausted for team '{req.team}'")
 
     # 2. Dispatcher — decide which car to send for this trip.
+    if req.force_model and req.force_model not in PRICING:
+        raise HTTPException(status_code=400,
+                            detail=f"Unknown model '{req.force_model}'. Valid: {sorted(PRICING)}")
     model, reason = (req.force_model, "forced") if req.force_model else choose_model(req.prompt)
 
     # 3. Drive.

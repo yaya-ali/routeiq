@@ -12,6 +12,8 @@ import json
 import pathlib
 import sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
 from app.providers import call_model
 from app.router import STRONG, choose_model
 

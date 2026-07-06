@@ -17,4 +17,10 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports: ["3001:3000"]  # host 3000 was taken locally
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     depends_on: [prometheus]
