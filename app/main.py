@@ -46,6 +46,13 @@ def demo() -> str:
     return (pathlib.Path(__file__).parent / "static" / "demo.html").read_text()
 
 
+@app.get("/chat", response_class=HTMLResponse)
+def chat_ui() -> str:
+    # Minimal chat UI for non-technical testing; conversation context is
+    # client-side (the gateway itself stays stateless).
+    return (pathlib.Path(__file__).parent / "static" / "chat.html").read_text()
+
+
 @app.post("/v1/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest, x_api_key: str = Header(default="anon")) -> ChatResponse:
     # 1. Budget gate — the taxi meter. Reject before spending money.
