@@ -12,6 +12,6 @@ jobs:
       - run: pytest tests/ -v
       # Eval gate — runs only when the secret is configured.
       # Blocks merges that make routing dumber.
-      - if: ${{ secrets.ANTHROPIC_API_KEY != '' }}
-        env: { ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}" }
+      - if: ${{ secrets.NVIDIA_API_KEY != '' }}
+        env: { NVIDIA_API_KEY: "${{ secrets.NVIDIA_API_KEY }}" }
         run: python evals/run_evals.py
