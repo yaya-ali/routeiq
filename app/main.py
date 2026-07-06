@@ -3,9 +3,11 @@
 Request flow:  client -> /v1/chat -> budget check -> complexity classifier
                -> model selection -> provider call -> metrics/trace -> response
 """
+import pathlib
 import time
 
 from fastapi import FastAPI, Header, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from app.budget import check_and_charge
@@ -36,6 +38,12 @@ class ChatResponse(BaseModel):
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/demo", response_class=HTMLResponse)
+def demo() -> str:
+    # Example consumer app: quiz generator with zero AI code of its own.
+    return (pathlib.Path(__file__).parent / "static" / "demo.html").read_text()
 
 
 @app.post("/v1/chat", response_model=ChatResponse)

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz generator — routeiq demo</title>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; color: #222; }
+  h1 { font-size: 1.4rem; }
+  .hint { color: #666; font-size: 0.9rem; }
+  textarea { width: 100%; height: 180px; font: inherit; padding: 10px; box-sizing: border-box; }
+  button { margin-top: 10px; padding: 10px 22px; font-size: 1rem; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: wait; }
+  #meta { margin-top: 14px; font-size: 0.85rem; color: #666; }
+  #quiz { white-space: pre-wrap; margin-top: 14px; line-height: 1.5; }
+  .err { color: #b00; }
+</style>
+</head>
+<body>
+<h1>Quiz generator</h1>
+<p class="hint">Paste any lesson text. The gateway routes the request to the right model and generates a quiz. This page is a demo consumer of the routeiq API — it contains zero AI code itself.</p>
+<textarea id="src" placeholder="Paste lesson text here — a lecture paragraph, an article section, anything..."></textarea>
+<br>
+<button id="go">Generate quiz</button>
+<div id="meta"></div>
+<div id="quiz"></div>
+<script>
+const btn = document.getElementById("go");
+const quiz = document.getElementById("quiz");
+const meta = document.getElementById("meta");
+
+function showError(msg) {
+  quiz.textContent = "Error: " + msg;
+  quiz.className = "err";
+}
+
+btn.onclick = async () => {
+  const text = document.getElementById("src").value.trim();
+  quiz.className = "";
+  meta.textContent = "";
+  if (text.length < 40) { showError("paste at least a paragraph first."); return; }
+  btn.disabled = true;
+  quiz.textContent = "Generating... (strong model can take a minute)";
+  try {
+    const res = await fetch("/v1/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        team: "quiz-demo",
+        prompt: "Write exactly 5 multiple-choice quiz questions (A-D options, mark the correct answer at the end of each question) strictly about the following text. Analyze the text carefully and test real understanding, not trivia.\n\nTEXT:\n" + text
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : res.status);
+    quiz.textContent = data.answer;
+    meta.textContent = `model: ${data.model_used} · reason: ${data.routing_reason} · cost: $${data.cost_usd} · ${data.latency_ms} ms`;
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    btn.disabled = false;
+  }
+};
+</script>
+</body>
+</html>
