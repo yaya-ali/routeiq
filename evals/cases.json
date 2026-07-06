@@ -1,0 +1,7 @@
+[
+  {"prompt": "What is the capital of Germany?", "must_contain": ["Berlin"]},
+  {"prompt": "Translate 'good morning' to French.", "must_contain": ["bonjour"]},
+  {"prompt": "Explain step by step the trade-offs between SQL and NoSQL databases for a high-write workload.", "must_contain": ["consistency", "scal", "schema"]},
+  {"prompt": "Debug this: def add(a,b): return a - b  # returns wrong result for add(2,3)", "must_contain": ["+", "subtract"]},
+  {"prompt": "List three primary colors.", "must_contain": ["red", "blue"]}
+]
