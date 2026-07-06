@@ -8,7 +8,7 @@ v1  = replace with a small classifier model or LLM-as-judge, and PROVE the
 """
 
 CHEAP = "claude-haiku-4-5-20251001"      # small cab
-STRONG = "claude-sonnet-4-6"             # S-Class
+STRONG = "claude-sonnet-5"               # S-Class
 
 # Signals that a prompt needs the strong model.
 REASONING_HINTS = (

@@ -7,7 +7,7 @@ import anthropic
 # USD per 1M tokens (input, output). TODO(you): verify current pricing.
 PRICING = {
     "claude-haiku-4-5-20251001": (1.00, 5.00),
-    "claude-sonnet-4-6": (3.00, 15.00),
+    "claude-sonnet-5": (3.00, 15.00),
 }
 
 _client = anthropic.AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
