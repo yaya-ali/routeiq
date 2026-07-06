@@ -1,6 +1,6 @@
 fastapi==0.115.*
 uvicorn[standard]==0.34.*
-anthropic>=0.40
+openai>=1.50
 redis==5.*
 prometheus-client==0.21.*
 pydantic>=2.9

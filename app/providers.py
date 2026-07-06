@@ -1,16 +1,24 @@
-"""Provider clients + cost accounting. Keep pricing in ONE place."""
+"""Provider clients + cost accounting. Keep pricing in ONE place.
+
+Provider: NVIDIA NIM (OpenAI-compatible endpoint, free tier).
+cost_usd is SYNTHETIC — NIM free tier bills nothing; the numbers below
+mirror typical market per-token rates so the cost-routing math stays real.
+"""
 import os
 from dataclasses import dataclass
 
-import anthropic
+from openai import AsyncOpenAI
 
-# USD per 1M tokens (input, output). TODO(you): verify current pricing.
+# USD per 1M tokens (input, output). Synthetic market-rate equivalents.
 PRICING = {
-    "claude-haiku-4-5-20251001": (1.00, 5.00),
-    "claude-sonnet-5": (3.00, 15.00),
+    "meta/llama-3.1-8b-instruct": (0.10, 0.30),
+    "meta/llama-3.3-70b-instruct": (0.70, 0.90),
 }
 
-_client = anthropic.AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+_client = AsyncOpenAI(
+    base_url="https://integrate.api.nvidia.com/v1",
+    api_key=os.environ.get("NVIDIA_API_KEY", ""),
+)
 
 
 @dataclass
@@ -27,15 +35,15 @@ def compute_cost(model: str, in_tok: int, out_tok: int) -> float:
 
 
 async def call_model(model: str, prompt: str) -> ModelResult:
-    resp = await _client.messages.create(
+    resp = await _client.chat.completions.create(
         model=model,
         max_tokens=1024,
         messages=[{"role": "user", "content": prompt}],
     )
-    in_tok = resp.usage.input_tokens
-    out_tok = resp.usage.output_tokens
+    in_tok = resp.usage.prompt_tokens
+    out_tok = resp.usage.completion_tokens
     return ModelResult(
-        text=resp.content[0].text,
+        text=resp.choices[0].message.content,
         input_tokens=in_tok,
         output_tokens=out_tok,
         cost_usd=compute_cost(model, in_tok, out_tok),

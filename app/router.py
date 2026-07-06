@@ -7,8 +7,8 @@ v1  = replace with a small classifier model or LLM-as-judge, and PROVE the
       upgrade helped using the eval suite (evals/run_evals.py).
 """
 
-CHEAP = "claude-haiku-4-5-20251001"      # small cab
-STRONG = "claude-sonnet-5"               # S-Class
+CHEAP = "meta/llama-3.1-8b-instruct"     # small cab
+STRONG = "meta/llama-3.3-70b-instruct"   # S-Class
 
 # Signals that a prompt needs the strong model.
 REASONING_HINTS = (
