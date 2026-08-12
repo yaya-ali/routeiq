@@ -1,0 +1,30 @@
+# Render blueprint — deploy with: New > Blueprint, point at this repo.
+# NVIDIA_API_KEY is marked sync:false, so Render prompts for it at deploy time
+# instead of storing the key in git.
+services:
+  - type: web
+    name: routeiq
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: DAILY_BUDGET_USD
+        value: "5.0"
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: routeiq-redis
+          property: connectionString
+
+databases: []
+
+keyValues:
+  - name: routeiq-redis
+    plan: free
+    # Budgets are the only thing stored here and they are date-keyed with a
+    # 48h TTL, so evicting the oldest key under memory pressure is harmless.
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []   # private network only — nothing outside Render can reach it

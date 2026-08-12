@@ -11,7 +11,20 @@ import redis
 
 DAILY_BUDGET_USD = float(os.environ.get("DAILY_BUDGET_USD", "5.0"))
 
-_r = redis.Redis(host=os.environ.get("REDIS_HOST", "localhost"), port=6379, decode_responses=True)
+
+def _connect() -> redis.Redis:
+    """Managed Redis (Render, Upstash, Heroku) hands out one URL carrying host,
+    port, and password; docker-compose just sets a hostname. Support both.
+    """
+    url = os.environ.get("REDIS_URL")
+    if url:
+        return redis.Redis.from_url(url, decode_responses=True)
+    return redis.Redis(
+        host=os.environ.get("REDIS_HOST", "localhost"), port=6379, decode_responses=True
+    )
+
+
+_r = _connect()
 
 
 def _today() -> str:
